@@ -1,38 +1,44 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>$(Authors)</Authors>
-    <Company>$(Company)</Company>
-    <Description>$(Description)
-This package It contains the storage implementation to integrate Silverback with Entity Framework Core. It is needed to use a DbContext as storage for (temporary) data and to fire the domain events as part of the SaveChanges transaction.</Description>
-    <PackageProjectUrl>$(ProjectUrl)</PackageProjectUrl>
-    <RepositoryUrl>$(RepositoryUrl)</RepositoryUrl>
-    <RepositoryType>$(RepositoryType)</RepositoryType>
-    <PackageLicenseExpression>$(License)</PackageLicenseExpression>
-    <Copyright>$(Copyright)</Copyright>
-    <Version>3.0.1$(VersionSuffix)</Version>
-    <RootNamespace>$(RootNamespace)</RootNamespace>
-    <PackageIconUrl>$(IconUrl)</PackageIconUrl>
-    <PackageTags>$(Tags)</PackageTags>
-    <LangVersion>$(LangVersion)</LangVersion>
-    <NoWarn>$(NoWarn)</NoWarn>
-    <PackageId>Silverback.Core.EntityFrameworkCore</PackageId>
-    <Product>Silverback.Core.EntityFrameworkCore</Product>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Authors>$(Authors)</Authors>
+        <Company>$(Company)</Company>
+        <Description>$(Description)
+This package It contains the storage implementation to integrate Silverback with Entity Framework Core. It is needed to use a DbContext as storage for (temporary) data and to fire the domain events as part of the SaveChanges transaction.
+        </Description>
+        <PackageProjectUrl>$(ProjectUrl)</PackageProjectUrl>
+        <RepositoryUrl>$(RepositoryUrl)</RepositoryUrl>
+        <RepositoryType>$(RepositoryType)</RepositoryType>
+        <PackageLicenseExpression>$(License)</PackageLicenseExpression>
+        <Copyright>$(Copyright)</Copyright>
+        <Version>3.0.1$(VersionSuffix)</Version>
+        <RootNamespace>$(RootNamespace)</RootNamespace>
+        <PackageIcon>Icon.png</PackageIcon>
+        <PackageTags>$(Tags)</PackageTags>
+        <LangVersion>$(LangVersion)</LangVersion>
+        <NoWarn>$(NoWarn)</NoWarn>
+        <PackageId>Silverback.Core.EntityFrameworkCore</PackageId>
+        <Product>Silverback.Core.EntityFrameworkCore</Product>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netstandard2.0\Silverback.Core.EntityFrameworkCore.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DocumentationFile>bin\Debug\netstandard2.0\Silverback.Core.EntityFrameworkCore.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netstandard2.0\Silverback.Core.EntityFrameworkCore.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <DocumentationFile>bin\Release\netstandard2.0\Silverback.Core.EntityFrameworkCore.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0" />
-    <PackageReference Include="Silverback.Core" Version="$(BaseVersion)" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0"/>
+        <PackageReference Include="Silverback.Core" Version="$(BaseVersion)"/>
+    </ItemGroup>
 
+    <ItemGroup>
+        <None Include="..\..\graphics\Icon.png" Pack="true" PackagePath="">
+            <Link>Properties\Icon.png</Link>
+        </None>
+    </ItemGroup>
 </Project>

@@ -1,37 +1,43 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>$(NetStandardTargetVersion)</TargetFramework>
-    <RootNamespace>$(RootNamespace)</RootNamespace>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>$(BaseVersion)</Version>
-    <Authors>$(Authors)</Authors>
-    <Company>$(Company)</Company>
-    <Description>$(Description)
-This package contains the default messages interfaces and domain entity implementation.</Description>
-    <PackageLicenseExpression>$(License)</PackageLicenseExpression>
-    <Copyright>$(Copyright)</Copyright>
-    <PackageProjectUrl>$(ProjectUrl)</PackageProjectUrl>
-    <RepositoryUrl>$(RepositoryUrl)</RepositoryUrl>
-    <RepositoryType>$(RepositoryType)</RepositoryType>
-    <PackageIconUrl>$(IconUrl)</PackageIconUrl>
-    <PackageTags>$(Tags)</PackageTags>
-    <LangVersion>$(LangVersion)</LangVersion>
-    <NoWarn>$(NoWarn)</NoWarn>
-    <PackageId>Silverback.Core.Model</PackageId>
-    <Product>Silverback.Core.Model</Product>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>$(NetStandardTargetVersion)</TargetFramework>
+        <RootNamespace>$(RootNamespace)</RootNamespace>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Version>$(BaseVersion)</Version>
+        <Authors>$(Authors)</Authors>
+        <Company>$(Company)</Company>
+        <Description>$(Description)
+This package contains the default messages interfaces and domain entity implementation.
+        </Description>
+        <PackageLicenseExpression>$(License)</PackageLicenseExpression>
+        <Copyright>$(Copyright)</Copyright>
+        <PackageProjectUrl>$(ProjectUrl)</PackageProjectUrl>
+        <RepositoryUrl>$(RepositoryUrl)</RepositoryUrl>
+        <RepositoryType>$(RepositoryType)</RepositoryType>
+        <PackageIcon>Icon.png</PackageIcon>
+        <PackageTags>$(Tags)</PackageTags>
+        <LangVersion>$(LangVersion)</LangVersion>
+        <NoWarn>$(NoWarn)</NoWarn>
+        <PackageId>Silverback.Core.Model</PackageId>
+        <Product>Silverback.Core.Model</Product>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netstandard2.0\Silverback.Core.Model.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DocumentationFile>bin\Debug\netstandard2.0\Silverback.Core.Model.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netstandard2.0\Silverback.Core.Model.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <DocumentationFile>bin\Release\netstandard2.0\Silverback.Core.Model.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Silverback.Core" Version="$(BaseVersion)" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Silverback.Core" Version="$(BaseVersion)"/>
+    </ItemGroup>
 
+    <ItemGroup>
+        <None Include="..\..\graphics\Icon.png" Pack="true" PackagePath="">
+            <Link>Properties\Icon.png</Link>
+        </None>
+    </ItemGroup>
 </Project>

@@ -13,8 +13,8 @@
         <RepositoryType>$(RepositoryType)</RepositoryType>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>$(Description)
-            This package contains an implementation of Silverback.Integration for the popular RabbitMQ message broker.</Description>
-        <PackageIconUrl>$(IconUrl)</PackageIconUrl>
+This package contains an implementation of Silverback.Integration for the popular RabbitMQ message broker.</Description>
+        <PackageIcon>Icon.png</PackageIcon>
         <PackageTags>$(Tags)</PackageTags>
         <LangVersion>$(LangVersion)</LangVersion>
         <NoWarn>$(NoWarn)</NoWarn>
@@ -35,4 +35,9 @@
         <PackageReference Include="Silverback.Integration" Version="$(BaseVersion)" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Include="..\..\graphics\Icon.png" Pack="true" PackagePath="">
+            <Link>Properties\Icon.png</Link>
+        </None>
+    </ItemGroup>
 </Project>
