@@ -36,7 +36,7 @@ namespace Silverback.Messaging.Broker
                 ChangeStatus(ConsumerStatus.Consuming);
 
             ConsumedMessagesCount++;
-            LatestConsumedMessageTimestamp = DateTime.Now;
+            LatestConsumedMessageTimestamp = DateTime.UtcNow;
             LatestConsumedMessageIdentifier = brokerMessageIdentifier;
         }
 

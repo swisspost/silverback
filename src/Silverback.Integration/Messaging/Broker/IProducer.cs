@@ -41,6 +41,12 @@ namespace Silverback.Messaging.Broker
         bool IsConnecting { get; }
 
         /// <summary>
+        ///     Gets the <see cref="IProducerStatusInfo" /> containing the status details and basic statistics of this
+        ///     consumer.
+        /// </summary>
+        IProducerStatusInfo StatusInfo { get; }
+
+        /// <summary>
         ///     Initializes the connection to the message broker (if needed).
         /// </summary>
         /// <returns>

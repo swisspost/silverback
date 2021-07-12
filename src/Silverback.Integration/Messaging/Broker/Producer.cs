@@ -22,6 +22,8 @@ namespace Silverback.Messaging.Broker
 
         private readonly IOutboundLogger<Producer> _logger;
 
+        private readonly ProducerStatusInfo _statusInfo = new();
+
         private Task? _connectTask;
 
         /// <summary>
@@ -69,6 +71,9 @@ namespace Silverback.Messaging.Broker
 
         /// <inheritdoc cref="IProducer.IsConnecting" />
         public bool IsConnecting => _connectTask != null;
+
+        /// <inheritdoc cref="IProducer.StatusInfo" />
+        public IProducerStatusInfo StatusInfo => _statusInfo;
 
         /// <inheritdoc cref="IProducer.IsConnected" />
         public bool IsConnected { get; private set; }
