@@ -50,7 +50,7 @@ namespace Silverback.Tests.Integration.E2E.Kafka
                                         .Configure(
                                             config =>
                                             {
-                                                config.GroupId = "consumer1";
+                                                config.GroupId = "group1";
                                             }))
                                 .AddInbound(
                                     endpoint => endpoint
@@ -58,7 +58,7 @@ namespace Silverback.Tests.Integration.E2E.Kafka
                                         .Configure(
                                             config =>
                                             {
-                                                config.GroupId = "consumer2";
+                                                config.GroupId = "group2";
                                             })))
                         .AddSingletonSubscriber<Subscriber>()
                         .AddIntegrationSpy())
@@ -106,7 +106,7 @@ namespace Silverback.Tests.Integration.E2E.Kafka
                                         .Configure(
                                             config =>
                                             {
-                                                config.GroupId = "consumer1";
+                                                config.GroupId = "group1";
                                             }))
                                 .AddInbound(
                                     endpoint => endpoint
@@ -115,7 +115,7 @@ namespace Silverback.Tests.Integration.E2E.Kafka
                                         .Configure(
                                             config =>
                                             {
-                                                config.GroupId = "consumer2";
+                                                config.GroupId = "group2";
                                             })))
                         .AddSingletonSubscriber<StreamSubscriber>()
                         .AddIntegrationSpy())
@@ -148,14 +148,14 @@ namespace Silverback.Tests.Integration.E2E.Kafka
 
             public int ReceivedConsumer2 => _receivedConsumer2;
 
-            [KafkaGroupIdFilter("consumer1")]
+            [KafkaGroupIdFilter("group1")]
             [SuppressMessage("ReSharper", "UnusedMember.Local", Justification = Justifications.CalledBySilverback)]
             [SuppressMessage("ReSharper", "UnusedParameter.Local", Justification = Justifications.CalledBySilverback)]
             [SuppressMessage("", "CA1801", Justification = Justifications.CalledBySilverback)]
             public void OnConsumer1Received(IMessage message) =>
                 Interlocked.Increment(ref _receivedConsumer1);
 
-            [KafkaGroupIdFilter("consumer2")]
+            [KafkaGroupIdFilter("group2")]
             [SuppressMessage("ReSharper", "UnusedMember.Local", Justification = Justifications.CalledBySilverback)]
             [SuppressMessage("ReSharper", "UnusedParameter.Local", Justification = Justifications.CalledBySilverback)]
             [SuppressMessage("", "CA1801", Justification = Justifications.CalledBySilverback)]
@@ -175,12 +175,12 @@ namespace Silverback.Tests.Integration.E2E.Kafka
 
             public int ReceivedConsumer2 => _receivedConsumer2;
 
-            [KafkaGroupIdFilter("consumer1")]
+            [KafkaGroupIdFilter("group1")]
             [SuppressMessage("ReSharper", "UnusedMember.Local", Justification = Justifications.CalledBySilverback)]
             public Task OnConsumer1Received(IAsyncEnumerable<IMessage> messages) =>
                 messages.ForEachAsync(_ => Interlocked.Increment(ref _receivedConsumer1));
 
-            [KafkaGroupIdFilter("consumer2")]
+            [KafkaGroupIdFilter("group2")]
             [SuppressMessage("ReSharper", "UnusedMember.Local", Justification = Justifications.CalledBySilverback)]
             public Task OnConsumer2Received(IAsyncEnumerable<IMessage> messages) =>
                 messages.ForEachAsync(_ => Interlocked.Increment(ref _receivedConsumer2));

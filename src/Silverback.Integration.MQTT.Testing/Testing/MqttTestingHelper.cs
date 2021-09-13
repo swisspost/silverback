@@ -39,24 +39,21 @@ namespace Silverback.Testing
             _logger = logger;
         }
 
-        /// <inheritdoc cref="ITestingHelper{TBroker}.WaitUntilAllMessagesAreConsumedAsync(TimeSpan?)" />
-        public override async Task WaitUntilAllMessagesAreConsumedAsync(TimeSpan? timeout = null)
+        /// <inheritdoc cref="ITestingHelper{TBroker}.WaitUntilAllMessagesAreConsumedAsync(CancellationToken)" />
+        public override async Task WaitUntilAllMessagesAreConsumedAsync(CancellationToken cancellationToken)
         {
             if (_inMemoryMqttBroker == null)
                 return;
-
-            using var cancellationTokenSource =
-                new CancellationTokenSource(timeout ?? TimeSpan.FromSeconds(30));
 
             try
             {
                 // Loop until the outbox is empty since the consumers may produce new messages
                 do
                 {
-                    await WaitUntilOutboxIsEmptyAsync(cancellationTokenSource.Token).ConfigureAwait(false);
+                    await WaitUntilOutboxIsEmptyAsync(cancellationToken).ConfigureAwait(false);
 
                     await _inMemoryMqttBroker
-                        .WaitUntilAllMessagesAreConsumedAsync(cancellationTokenSource.Token)
+                        .WaitUntilAllMessagesAreConsumedAsync(cancellationToken)
                         .ConfigureAwait(false);
                 }
                 while (!await IsOutboxEmptyAsync().ConfigureAwait(false));
