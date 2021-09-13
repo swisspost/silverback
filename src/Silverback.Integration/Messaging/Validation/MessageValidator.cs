@@ -29,10 +29,7 @@ namespace Silverback.Messaging.Validation
                     validationResult => $"{Environment.NewLine}- {validationResult.ErrorMessage}"));
 
             if (validationMode == MessageValidationMode.ThrowException)
-            {
-                throw new
-                    MessageValidationException($"The message is not valid:{validationResults}");
-            }
+                throw new MessageValidationException($"The message is not valid:{validationResults}");
 
             return (false, validationResults);
         }
