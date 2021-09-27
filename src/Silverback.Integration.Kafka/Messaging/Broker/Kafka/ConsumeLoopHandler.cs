@@ -19,15 +19,17 @@ namespace Silverback.Messaging.Broker.Kafka
         private readonly ISilverbackLogger _logger;
 
         [SuppressMessage("", "CA2213", Justification = "Doesn't have to be disposed")]
-        private ConsumerChannelsManager? _channelsManager;
+        private readonly ConsumerChannelsManager _channelsManager;
 
         private CancellationTokenSource _cancellationTokenSource = new();
 
         private TaskCompletionSource<bool>? _consumeTaskCompletionSource;
 
+        private bool _disposed;
+
         public ConsumeLoopHandler(
             KafkaConsumer consumer,
-            ConsumerChannelsManager? channelsManager,
+            ConsumerChannelsManager channelsManager,
             ISilverbackLogger logger)
         {
             _consumer = Check.NotNull(consumer, nameof(consumer));
@@ -44,6 +46,9 @@ namespace Silverback.Messaging.Broker.Kafka
         [SuppressMessage("", "VSTHRD110", Justification = Justifications.FireAndForget)]
         public void Start()
         {
+            if (_disposed)
+                throw new ObjectDisposedException(GetType().FullName);
+
             if (IsConsuming)
                 return;
 
@@ -70,6 +75,9 @@ namespace Silverback.Messaging.Broker.Kafka
 
         public Task StopAsync()
         {
+            if (_disposed)
+                throw new ObjectDisposedException(GetType().FullName);
+
             if (!IsConsuming)
                 return Stopping;
 
@@ -85,11 +93,11 @@ namespace Silverback.Messaging.Broker.Kafka
             return Stopping;
         }
 
-        public void SetChannelsManager(ConsumerChannelsManager channelsManager) =>
-            _channelsManager = channelsManager;
-
         public void Dispose()
         {
+            if (_disposed)
+                return;
+
             _logger.LogConsumerLowLevelTrace(
                 _consumer,
                 "Disposing ConsumeLoopHandler... | instanceId: {instanceId}",
@@ -102,6 +110,8 @@ namespace Silverback.Messaging.Broker.Kafka
                 _consumer,
                 "ConsumeLoopHandler disposed. | instanceId: {instanceId}",
                 () => new object[] { Id });
+
+            _disposed = true;
         }
 
         private async Task ConsumeAsync(
@@ -154,9 +164,6 @@ namespace Silverback.Messaging.Broker.Kafka
                     return true;
 
                 _logger.LogConsuming(consumeResult, _consumer);
-
-                if (_channelsManager == null)
-                    throw new InvalidOperationException("The ChannelsManager is not initialized.");
 
                 _channelsManager.Write(consumeResult, cancellationToken);
             }
