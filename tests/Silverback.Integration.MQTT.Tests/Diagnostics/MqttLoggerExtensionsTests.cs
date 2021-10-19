@@ -11,11 +11,14 @@ using MQTTnet.Client.Options;
 using MQTTnet.Exceptions;
 using MQTTnet.Packets;
 using NSubstitute;
+using Silverback.Collections;
+using Silverback.Configuration;
 using Silverback.Diagnostics;
 using Silverback.Messaging;
 using Silverback.Messaging.Broker;
 using Silverback.Messaging.Broker.Callbacks;
 using Silverback.Messaging.Broker.Mqtt;
+using Silverback.Messaging.Configuration;
 using Silverback.Messaging.Configuration.Mqtt;
 using Silverback.Messaging.Messages;
 using Silverback.Tests.Logging;
@@ -31,9 +34,10 @@ namespace Silverback.Tests.Integration.Mqtt.Diagnostics
 
         private readonly IServiceProvider _serviceProvider;
 
-        private readonly MqttConsumerEndpoint _consumerEndpoint = new("test")
+        private readonly MqttConsumerConfiguration _consumerConfiguration = new()
         {
-            Configuration = new MqttClientConfig
+            Topics = new ValueReadOnlyCollection<string>(new[] { "test" }),
+            Client = new MqttClientConfiguration
             {
                 ChannelOptions = new MqttClientTcpOptions
                 {
@@ -61,10 +65,10 @@ namespace Silverback.Tests.Integration.Mqtt.Diagnostics
         [Fact]
         public void LogConsuming_Logged()
         {
-            var consumer = (MqttConsumer)_serviceProvider.GetRequiredService<MqttBroker>()
-                .AddConsumer(_consumerEndpoint);
+            MqttConsumer consumer = (MqttConsumer)_serviceProvider.GetRequiredService<MqttBroker>()
+                .AddConsumer(_consumerConfiguration);
 
-            var expectedMessage =
+            string expectedMessage =
                 "Consuming message '123' from topic 'actual'. | " +
                 $"consumerId: {consumer.Id}, endpointName: actual";
 
@@ -86,16 +90,16 @@ namespace Silverback.Tests.Integration.Mqtt.Diagnostics
         [Fact]
         public void LogConnectError_Logged()
         {
-            var mqttClientWrapper = new MqttClientWrapper(
+            MqttClientWrapper mqttClientWrapper = new(
                 Substitute.For<IMqttClient>(),
-                new MqttClientConfig
+                new MqttClientConfiguration
                 {
                     ClientId = "test-client"
                 },
                 Substitute.For<IBrokerCallbacksInvoker>(),
                 _silverbackLogger);
 
-            var expectedMessage =
+            string expectedMessage =
                 "Error occurred connecting to the MQTT broker. | clientId: test-client";
 
             _silverbackLogger.LogConnectError(mqttClientWrapper, new MqttCommunicationException("test"));
@@ -110,16 +114,16 @@ namespace Silverback.Tests.Integration.Mqtt.Diagnostics
         [Fact]
         public void LogConnectRetryError_Logged()
         {
-            var mqttClientWrapper = new MqttClientWrapper(
+            MqttClientWrapper mqttClientWrapper = new(
                 Substitute.For<IMqttClient>(),
-                new MqttClientConfig
+                new MqttClientConfiguration
                 {
                     ClientId = "test-client"
                 },
                 Substitute.For<IBrokerCallbacksInvoker>(),
                 _silverbackLogger);
 
-            var expectedMessage =
+            string expectedMessage =
                 "Error occurred retrying to connect to the MQTT broker. | clientId: test-client";
 
             _silverbackLogger.LogConnectRetryError(mqttClientWrapper, new MqttCommunicationException("test"));
@@ -134,16 +138,16 @@ namespace Silverback.Tests.Integration.Mqtt.Diagnostics
         [Fact]
         public void LogConnectionLost_Logged()
         {
-            var mqttClientWrapper = new MqttClientWrapper(
+            MqttClientWrapper mqttClientWrapper = new(
                 Substitute.For<IMqttClient>(),
-                new MqttClientConfig
+                new MqttClientConfiguration
                 {
                     ClientId = "test-client"
                 },
                 Substitute.For<IBrokerCallbacksInvoker>(),
                 _silverbackLogger);
 
-            var expectedMessage =
+            string expectedMessage =
                 "Connection with the MQTT broker lost. The client will try to reconnect. | " +
                 "clientId: test-client";
 

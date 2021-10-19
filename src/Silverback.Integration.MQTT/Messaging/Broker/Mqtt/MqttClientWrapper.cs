@@ -40,17 +40,17 @@ namespace Silverback.Messaging.Broker.Mqtt
 
         public MqttClientWrapper(
             IMqttClient mqttClient,
-            MqttClientConfig clientConfig,
+            MqttClientConfiguration clientConfiguration,
             IBrokerCallbacksInvoker brokerCallbacksInvoker,
             ISilverbackLogger logger)
         {
-            ClientConfig = clientConfig;
+            ClientConfiguration = clientConfiguration;
             MqttClient = mqttClient;
             _brokerCallbacksInvoker = brokerCallbacksInvoker;
             _logger = logger;
         }
 
-        public MqttClientConfig ClientConfig { get; }
+        public MqttClientConfiguration ClientConfiguration { get; }
 
         public IMqttClient MqttClient { get; }
 
@@ -114,7 +114,7 @@ namespace Silverback.Messaging.Broker.Mqtt
             }
 
             await _brokerCallbacksInvoker.InvokeAsync<IMqttClientDisconnectingCallback>(
-                    handler => handler.OnClientDisconnectingAsync(ClientConfig))
+                    handler => handler.OnClientDisconnectingAsync(ClientConfiguration))
                 .ConfigureAwait(false);
 
             if (MqttClient.IsConnected)
@@ -182,7 +182,7 @@ namespace Silverback.Messaging.Broker.Mqtt
                 await Consumer.OnConnectionEstablishedAsync().ConfigureAwait(false);
 
             await _brokerCallbacksInvoker.InvokeAsync<IMqttClientConnectedCallback>(
-                    handler => handler.OnClientConnectedAsync(ClientConfig))
+                    handler => handler.OnClientConnectedAsync(ClientConfiguration))
                 .ConfigureAwait(false);
 
             return true;
@@ -194,7 +194,7 @@ namespace Silverback.Messaging.Broker.Mqtt
             try
             {
                 await MqttClient
-                    .ConnectAsync(ClientConfig.GetMqttClientOptions(), cancellationToken)
+                    .ConnectAsync(ClientConfiguration.GetMqttClientOptions(), cancellationToken)
                     .ConfigureAwait(false);
 
                 return true;

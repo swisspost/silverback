@@ -61,7 +61,7 @@ namespace Silverback.Diagnostics
             Exception exception) =>
             ConnectError(
                 logger.InnerLogger,
-                client.ClientConfig.ClientId,
+                client.ClientConfiguration.ClientId,
                 exception);
 
         public static void LogConnectRetryError(
@@ -70,7 +70,7 @@ namespace Silverback.Diagnostics
             Exception exception) =>
             ConnectRetryError(
                 logger.InnerLogger,
-                client.ClientConfig.ClientId,
+                client.ClientConfiguration.ClientId,
                 exception);
 
         public static void LogConnectionLost(
@@ -78,7 +78,7 @@ namespace Silverback.Diagnostics
             MqttClientWrapper client) =>
             ConnectionLost(
                 logger.InnerLogger,
-                client.ClientConfig.ClientId,
+                client.ClientConfiguration.ClientId,
                 null);
 
         public static void LogProducerQueueProcessingCanceled(
@@ -87,7 +87,7 @@ namespace Silverback.Diagnostics
             ProducerQueueProcessingCanceled(
                 logger.InnerLogger,
                 producer.Id,
-                producer.Endpoint.DisplayName,
+                producer.Configuration.DisplayName,
                 null);
 
         public static void LogMqttClientError(

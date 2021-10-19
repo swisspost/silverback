@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Silverback.Configuration;
 using Silverback.Diagnostics;
 using Silverback.Messaging.Messages;
 using Silverback.Messaging.Validation;
@@ -112,16 +113,17 @@ namespace Silverback.Tests.Integration.Messaging.Validation
         [MemberData(nameof(HandleAsync_None_WarningIsNotLogged_TestData))]
         public async Task HandleAsync_None_WarningIsNotLogged(IIntegrationMessage message)
         {
-            var endpoint = TestConsumerEndpoint.GetDefault();
-            endpoint.MessageValidationMode = MessageValidationMode.None;
+            TestConsumerEndpoint endpoint = new TestConsumerConfiguration("topic1")
+            {
+                MessageValidationMode = MessageValidationMode.None
+            }.GetDefaultEndpoint();
 
             var envelope = new InboundEnvelope(
                 message,
                 null,
                 null,
                 new TestOffset(),
-                endpoint,
-                "source-endpoint");
+                endpoint);
 
             IRawInboundEnvelope? result = null;
             await new ValidatorConsumerBehavior(_inboundLogger).HandleAsync(
@@ -144,16 +146,17 @@ namespace Silverback.Tests.Integration.Messaging.Validation
         {
             var message = new TestValidationMessage
                 { Id = "1", String10 = "123", IntRange = 5, NumbersOnly = "123" };
-            var endpoint = TestConsumerEndpoint.GetDefault();
-            endpoint.MessageValidationMode = validationMode;
+            TestConsumerEndpoint endpoint = new TestConsumerConfiguration("topic1")
+            {
+                MessageValidationMode = validationMode
+            }.GetDefaultEndpoint();
 
             var envelope = new InboundEnvelope(
                 message,
                 null,
                 null,
                 new TestOffset(),
-                endpoint,
-                "source-endpoint");
+                endpoint);
 
             IRawInboundEnvelope? result = null;
             Func<Task> act = () => new ValidatorConsumerBehavior(_inboundLogger).HandleAsync(
@@ -174,16 +177,17 @@ namespace Silverback.Tests.Integration.Messaging.Validation
             IIntegrationMessage message,
             string expectedValidationMessage)
         {
-            var endpoint = TestConsumerEndpoint.GetDefault();
-            endpoint.MessageValidationMode = MessageValidationMode.LogWarning;
+            TestConsumerEndpoint endpoint = new TestConsumerConfiguration("topic1")
+            {
+                MessageValidationMode = MessageValidationMode.LogWarning
+            }.GetDefaultEndpoint();
 
             var envelope = new InboundEnvelope(
                 message,
                 null,
                 null,
                 new TestOffset(),
-                endpoint,
-                "source-endpoint");
+                endpoint);
 
             IRawInboundEnvelope? result = null;
             await new ValidatorConsumerBehavior(_inboundLogger).HandleAsync(
@@ -205,16 +209,16 @@ namespace Silverback.Tests.Integration.Messaging.Validation
                 { Id = "1", String10 = "123456789abc", IntRange = 5, NumbersOnly = "123" };
             var expectedMessage =
                 $"The message is not valid:{Environment.NewLine}- The field String10 must be a string with a maximum length of 10.";
-            var endpoint = TestConsumerEndpoint.GetDefault();
-            endpoint.MessageValidationMode = MessageValidationMode.ThrowException;
-
+            TestConsumerEndpoint endpoint = new TestConsumerConfiguration("topic1")
+            {
+                MessageValidationMode = MessageValidationMode.ThrowException
+            }.GetDefaultEndpoint();
             var envelope = new InboundEnvelope(
                 message,
                 null,
                 null,
                 new TestOffset(),
-                endpoint,
-                "source-endpoint");
+                endpoint);
 
             IRawInboundEnvelope? result = null;
             Func<Task> act = () => new ValidatorConsumerBehavior(_inboundLogger).HandleAsync(
