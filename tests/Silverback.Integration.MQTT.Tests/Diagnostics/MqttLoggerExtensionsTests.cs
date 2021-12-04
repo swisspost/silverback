@@ -24,140 +24,139 @@ using Silverback.Messaging.Messages;
 using Silverback.Tests.Logging;
 using Xunit;
 
-namespace Silverback.Tests.Integration.Mqtt.Diagnostics
+namespace Silverback.Tests.Integration.Mqtt.Diagnostics;
+
+public class MqttLoggerExtensionsTests
 {
-    public class MqttLoggerExtensionsTests
+    private readonly LoggerSubstitute<MqttLoggerExtensionsTests> _loggerSubstitute;
+
+    private readonly ISilverbackLogger<MqttLoggerExtensionsTests> _silverbackLogger;
+
+    private readonly IServiceProvider _serviceProvider;
+
+    private readonly MqttConsumerConfiguration _consumerConfiguration = new()
     {
-        private readonly LoggerSubstitute<MqttLoggerExtensionsTests> _loggerSubstitute;
-
-        private readonly ISilverbackLogger<MqttLoggerExtensionsTests> _silverbackLogger;
-
-        private readonly IServiceProvider _serviceProvider;
-
-        private readonly MqttConsumerConfiguration _consumerConfiguration = new()
+        Topics = new ValueReadOnlyCollection<string>(new[] { "test" }),
+        Client = new MqttClientConfiguration
         {
-            Topics = new ValueReadOnlyCollection<string>(new[] { "test" }),
-            Client = new MqttClientConfiguration
+            ChannelOptions = new MqttClientTcpOptions
             {
-                ChannelOptions = new MqttClientTcpOptions
-                {
-                    Server = "test-server"
-                }
+                Server = "test-server"
             }
-        };
-
-        public MqttLoggerExtensionsTests()
-        {
-            _serviceProvider = ServiceProviderHelper.GetServiceProvider(
-                services => services
-                    .AddLoggerSubstitute(LogLevel.Trace)
-                    .AddSilverback()
-                    .WithConnectionToMessageBroker(options => options.AddMqtt()));
-
-            _loggerSubstitute =
-                (LoggerSubstitute<MqttLoggerExtensionsTests>)_serviceProvider
-                    .GetRequiredService<ILogger<MqttLoggerExtensionsTests>>();
-
-            _silverbackLogger = _serviceProvider
-                .GetRequiredService<ISilverbackLogger<MqttLoggerExtensionsTests>>();
         }
+    };
 
-        [Fact]
-        public void LogConsuming_Logged()
-        {
-            MqttConsumer consumer = (MqttConsumer)_serviceProvider.GetRequiredService<MqttBroker>()
-                .AddConsumer(_consumerConfiguration);
+    public MqttLoggerExtensionsTests()
+    {
+        _serviceProvider = ServiceProviderHelper.GetServiceProvider(
+            services => services
+                .AddLoggerSubstitute(LogLevel.Trace)
+                .AddSilverback()
+                .WithConnectionToMessageBroker(options => options.AddMqtt()));
 
-            string expectedMessage =
-                "Consuming message '123' from topic 'actual'. | " +
-                $"consumerId: {consumer.Id}, endpointName: actual";
+        _loggerSubstitute =
+            (LoggerSubstitute<MqttLoggerExtensionsTests>)_serviceProvider
+                .GetRequiredService<ILogger<MqttLoggerExtensionsTests>>();
 
-            _silverbackLogger.LogConsuming(
-                new ConsumedApplicationMessage(
-                    new MqttApplicationMessage
+        _silverbackLogger = _serviceProvider
+            .GetRequiredService<ISilverbackLogger<MqttLoggerExtensionsTests>>();
+    }
+
+    [Fact]
+    public void LogConsuming_Logged()
+    {
+        MqttConsumer consumer = (MqttConsumer)_serviceProvider.GetRequiredService<MqttBroker>()
+            .AddConsumer(_consumerConfiguration);
+
+        string expectedMessage =
+            "Consuming message '123' from topic 'actual'. | " +
+            $"consumerId: {consumer.Id}, endpointName: actual";
+
+        _silverbackLogger.LogConsuming(
+            new ConsumedApplicationMessage(
+                new MqttApplicationMessage
+                {
+                    Topic = "actual",
+                    UserProperties = new List<MqttUserProperty>
                     {
-                        Topic = "actual",
-                        UserProperties = new List<MqttUserProperty>
-                        {
-                            new(DefaultMessageHeaders.MessageId, "123")
-                        }
-                    }),
-                consumer);
+                        new(DefaultMessageHeaders.MessageId, "123")
+                    }
+                }),
+            consumer);
 
-            _loggerSubstitute.Received(LogLevel.Debug, null, expectedMessage, 4011);
-        }
+        _loggerSubstitute.Received(LogLevel.Debug, null, expectedMessage, 4011);
+    }
 
-        [Fact]
-        public void LogConnectError_Logged()
-        {
-            MqttClientWrapper mqttClientWrapper = new(
-                Substitute.For<IMqttClient>(),
-                new MqttClientConfiguration
-                {
-                    ClientId = "test-client"
-                },
-                Substitute.For<IBrokerCallbacksInvoker>(),
-                _silverbackLogger);
+    [Fact]
+    public void LogConnectError_Logged()
+    {
+        MqttClientWrapper mqttClientWrapper = new(
+            Substitute.For<IMqttClient>(),
+            new MqttClientConfiguration
+            {
+                ClientId = "test-client"
+            },
+            Substitute.For<IBrokerCallbacksInvoker>(),
+            _silverbackLogger);
 
-            string expectedMessage =
-                "Error occurred connecting to the MQTT broker. | clientId: test-client";
+        string expectedMessage =
+            "Error occurred connecting to the MQTT broker. | clientId: test-client";
 
-            _silverbackLogger.LogConnectError(mqttClientWrapper, new MqttCommunicationException("test"));
+        _silverbackLogger.LogConnectError(mqttClientWrapper, new MqttCommunicationException("test"));
 
-            _loggerSubstitute.Received(
-                LogLevel.Warning,
-                typeof(MqttCommunicationException),
-                expectedMessage,
-                4021);
-        }
+        _loggerSubstitute.Received(
+            LogLevel.Warning,
+            typeof(MqttCommunicationException),
+            expectedMessage,
+            4021);
+    }
 
-        [Fact]
-        public void LogConnectRetryError_Logged()
-        {
-            MqttClientWrapper mqttClientWrapper = new(
-                Substitute.For<IMqttClient>(),
-                new MqttClientConfiguration
-                {
-                    ClientId = "test-client"
-                },
-                Substitute.For<IBrokerCallbacksInvoker>(),
-                _silverbackLogger);
+    [Fact]
+    public void LogConnectRetryError_Logged()
+    {
+        MqttClientWrapper mqttClientWrapper = new(
+            Substitute.For<IMqttClient>(),
+            new MqttClientConfiguration
+            {
+                ClientId = "test-client"
+            },
+            Substitute.For<IBrokerCallbacksInvoker>(),
+            _silverbackLogger);
 
-            string expectedMessage =
-                "Error occurred retrying to connect to the MQTT broker. | clientId: test-client";
+        string expectedMessage =
+            "Error occurred retrying to connect to the MQTT broker. | clientId: test-client";
 
-            _silverbackLogger.LogConnectRetryError(mqttClientWrapper, new MqttCommunicationException("test"));
+        _silverbackLogger.LogConnectRetryError(mqttClientWrapper, new MqttCommunicationException("test"));
 
-            _loggerSubstitute.Received(
-                LogLevel.Debug,
-                typeof(MqttCommunicationException),
-                expectedMessage,
-                4022);
-        }
+        _loggerSubstitute.Received(
+            LogLevel.Debug,
+            typeof(MqttCommunicationException),
+            expectedMessage,
+            4022);
+    }
 
-        [Fact]
-        public void LogConnectionLost_Logged()
-        {
-            MqttClientWrapper mqttClientWrapper = new(
-                Substitute.For<IMqttClient>(),
-                new MqttClientConfiguration
-                {
-                    ClientId = "test-client"
-                },
-                Substitute.For<IBrokerCallbacksInvoker>(),
-                _silverbackLogger);
+    [Fact]
+    public void LogConnectionLost_Logged()
+    {
+        MqttClientWrapper mqttClientWrapper = new(
+            Substitute.For<IMqttClient>(),
+            new MqttClientConfiguration
+            {
+                ClientId = "test-client"
+            },
+            Substitute.For<IBrokerCallbacksInvoker>(),
+            _silverbackLogger);
 
-            string expectedMessage =
-                "Connection with the MQTT broker lost. The client will try to reconnect. | " +
-                "clientId: test-client";
+        string expectedMessage =
+            "Connection with the MQTT broker lost. The client will try to reconnect. | " +
+            "clientId: test-client";
 
-            _silverbackLogger.LogConnectionLost(mqttClientWrapper);
+        _silverbackLogger.LogConnectionLost(mqttClientWrapper);
 
-            _loggerSubstitute.Received(
-                LogLevel.Warning,
-                null,
-                expectedMessage,
-                4023);
-        }
+        _loggerSubstitute.Received(
+            LogLevel.Warning,
+            null,
+            expectedMessage,
+            4023);
     }
 }
