@@ -94,7 +94,7 @@ public class SubscribedMethod
     /// <returns>
     ///     The target type.
     /// </returns>
-    public object? ResolveTargetType(IServiceProvider serviceProvider) => _targetTypeFactory.Invoke(serviceProvider);
+    public object ResolveTargetType(IServiceProvider serviceProvider) => _targetTypeFactory.Invoke(serviceProvider);
 
     internal SubscribedMethod EnsureInitialized(IServiceProvider serviceProvider)
     {

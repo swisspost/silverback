@@ -3,20 +3,17 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
 using Confluent.Kafka;
 using Microsoft.Extensions.DependencyInjection;
 using Silverback.Diagnostics;
 using Silverback.Messaging.Broker.Callbacks;
 using Silverback.Messaging.Configuration.Kafka;
-using Silverback.Util;
 
 namespace Silverback.Messaging.Broker.Kafka;
 
 internal sealed class ConfluentProducersCache : IConfluentProducersCache
 {
-    private readonly ConcurrentDictionary<ProducerConfig, IProducer<byte[]?, byte[]?>> _producersCache =
-        new(new ConfigurationDictionaryEqualityComparer<string, string>());
+    private readonly ConcurrentDictionary<KafkaClientProducerConfiguration, IProducer<byte[]?, byte[]?>> _producersCache = new();
 
     private readonly IBrokerCallbacksInvoker _callbacksInvoker;
 
@@ -36,13 +33,14 @@ internal sealed class ConfluentProducersCache : IConfluentProducersCache
 
     public IProducer<byte[]?, byte[]?> GetProducer(KafkaClientProducerConfiguration configuration, KafkaProducer owner) =>
         _producersCache.GetOrAdd(
-            configuration.GetConfluentClientConfig(),
-            _ => CreateConfluentProducer(configuration, owner));
+            configuration,
+            (keyConfiguration, ownerArgument) => CreateConfluentProducer(keyConfiguration, ownerArgument),
+            owner);
 
     public void DisposeProducer(KafkaClientProducerConfiguration configuration)
     {
         // Dispose only if still in cache to avoid ObjectDisposedException
-        if (!_producersCache.TryRemove(configuration.GetConfluentClientConfig(), out IProducer<byte[]?, byte[]?>? producer))
+        if (!_producersCache.TryRemove(configuration, out IProducer<byte[]?, byte[]?>? producer))
             return;
 
         producer.Flush(configuration.FlushTimeout);
@@ -60,8 +58,4 @@ internal sealed class ConfluentProducersCache : IConfluentProducersCache
         builder.SetEventsHandlers(ownerProducer, _callbacksInvoker, _logger);
         return builder.Build();
     }
-
-    [SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1201:Elements should appear in the correct order", Justification = "False positive, remove suppression once record struct is handled properly")]
-    [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1313:Parameter names should begin with lower-case letter", Justification = "False positive, remove suppression once record struct is handled properly")]
-    private record struct NewProducerParameters(KafkaClientProducerConfiguration Configuration, KafkaProducer Owner);
 }
