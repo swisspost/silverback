@@ -1,9 +1,6 @@
 ﻿// Copyright (c) 2020 Sergio Aquilini
 // This code is licensed under MIT license (see LICENSE file for details)
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Silverback.Configuration;
 using Silverback.Messaging.Broker;
 using Silverback.Messaging.Broker.Kafka.Mocks;
